@@ -22,13 +22,44 @@ const add = (state = { total: 0 }, action) => {
   }
   return state;
 };
-const reducers = combineReducers({ add });
+
+const URL = "https://nodetestapi-pnmjtlievk.now.sh/technos";
+
+//reducer
+export const getTechnos = () => dispatch => {
+  console.log("getTechnos thunk / technos / before return");
+  return fetch(URL)
+    .then(data => data.json())
+    .then(technos => {
+      console.log("getTechnos thunk / technos", technos);
+      dispatch({
+        type: "ADD_TECHNOS",
+        payload: technos
+      });
+    })
+    .catch(err => console.error(err));
+};
+
+// reducer
+const addTechnos = (state = [], action) => {
+  console.log("addTechnos / before if");
+  if (action.type === "ADD_TECHNOS") {
+    const newState = action.payload;
+    console.log("addTechnos / newState", newState);
+    return newState;
+  }
+  return state;
+};
+
+const reducers = combineReducers({ add, technos: addTechnos });
 
 const store = createStore(
   reducers,
   compose(
     applyMiddleware(thunk),
-    window.devToolsExtension ? window.devToolsExtension() : f => f
+    window.__REDUX_DEVTOOLS_EXTENSION__
+      ? window.__REDUX_DEVTOOLS_EXTENSION__()
+      : f => f
   )
 );
 
